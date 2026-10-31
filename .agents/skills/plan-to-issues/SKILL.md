@@ -15,20 +15,55 @@ in a shell this agent can run.
    One issue per unit of work.
 3. **Stop and show the table to the human.** Publish nothing until they approve it.
 4. Ask the human what every issue here must carry (fields, labels, wording), unless it is
-   already written down in this session or in the repo.
+   already written down in this session or in the repo. It is written down below; ask only
+   about changes.
 5. Create each issue in dependency order, so blocked-by can cite real numbers:
 
    ```sh
-   gh issue create --title "<title>" --body-file <tmp.md>
+   gh label create plan:<plan> 2>/dev/null   # once per plan
+   gh issue create --title "<title>" --label plan:<plan> --body-file <tmp.md>
    ```
 
 6. Record every issue URL from gh's output (not from memory) and reply with the list.
 
-Closing one, with the closing comment from AGENTS.md:
+## What every issue carries
+
+Approved by the repo owner (szwedol) for the morning-digest plan, 2026-10-31.
+
+- Label `plan:<plan>`, the `plan:` value from `plan.md`'s frontmatter (e.g. `plan:morning-digest`).
+  Reviewers sort by it.
+- Body, in this order:
+
+  ```md
+  Source: plan.md § <n>
+
+  **Scope**
+  <what this issue changes, and what it must not touch>
+
+  **Done when**
+  <the plan's "Done when", checkable>
+
+  **Blocked by**
+  <#n list, or "—". "#1 to start; done needs #2" when work can start early but can't finish>
+  ```
+
+- The first line is always `Source: plan.md § <n>`, with the plan's own section number
+  (`§ 2a`, not a renumbered one). Two issues may share a section when the plan says one part
+  goes first.
+
+## Closing
+
+With the closing comment from AGENTS.md:
 
 ```sh
 gh issue close <n> -c "<closing comment>"
 ```
+
+- A commit message with `closes #n` closes the issue on push, before any comment. Then add the
+  closing comment with `gh issue comment <n> -b "..."`.
+- Close only when "Done when" holds for whoever it depends on. A preview is not done when the
+  link is sent; it is done when the reviewer has looked. Until then, leave it open and say what
+  it waits on.
 
 ## No `gh`
 
